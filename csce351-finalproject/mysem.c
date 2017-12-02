@@ -14,8 +14,8 @@
 int semInit(semaphore * sem, int semVal)
 {
 	//sem.queue =
-	sem.threadCount = 0;
-	sem.value = semVal;
+	//sem.threadCount = 0;
+	//sem.value = semVal;
 	/* add your code to initialize your semaphore here */
 	return 1;
 }
