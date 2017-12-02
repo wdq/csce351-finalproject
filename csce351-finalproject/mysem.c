@@ -6,6 +6,7 @@
  */
 
 #include "mysem.h"
+#include <stdio.h>
 
 // Returns 1 if initialization is successful
 // Returns 0 if it fails.
@@ -13,9 +14,8 @@
 // The function initializes the semaphore's internal data fields.
 int semInit(semaphore * sem, int semVal)
 {
-	//sem.queue =
-	//sem.threadCount = 0;
-	//sem.value = semVal;
+	sem->threadCount = 0;
+	sem->value = semVal;
 	/* add your code to initialize your semaphore here */
 	return 1;
 }
@@ -26,6 +26,18 @@ int semInit(semaphore * sem, int semVal)
 // As such, the semaphore value never falls below 0.
 void semDown(semaphore * sem)
 {
+	if(semValue(sem) == 0) {
+		while(1) {
+			if(semValue(sem) > 0) {
+				break;
+			}
+		}
+	}
+	unsigned int currentSemValue = semValue(sem);
+
+	if(currentSemValue > 0) {
+		sem->value = currentSemValue - 1;
+	}
 	/* implement your logic to perform down operation on a semaphore here */
 }
 
@@ -35,6 +47,7 @@ void semDown(semaphore * sem)
 // As such, after an up on a semaphore with threads sleeping on it, the semaphore value is still 0, but there are no more sleeping threads.
 void semUp(semaphore * sem)
 {
+	sem->value = semValue(sem) + 1;
 	/* implement your logic to perform up operation on a semaphore here */
 }
 
