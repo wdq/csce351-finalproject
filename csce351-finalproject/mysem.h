@@ -8,12 +8,12 @@
 #ifndef MYSEM_H_
 #define MYSEM_H_
 
-#include "queue.h"
+#include "blocked_queue.h"
 
 struct mySem{
 	int threadCount;
 	int value;
-	Q_type queue;
+	BQ_type queue;
 };
 
 typedef struct mySem semaphore;

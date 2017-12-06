@@ -147,6 +147,7 @@ C_SRCS += mysem.c
 C_SRCS += project1.c
 C_SRCS += queue.c
 C_SRCS += thread_handler.c
+C_SRCS += blocked_queue.c
 CXX_SRCS :=
 ASM_SRCS := exception_handler.S
 

@@ -1,11 +1,7 @@
 #include <stdio.h>
-#include "queue.h"
+#include "blocked_queue.h"
 
-// Created a copy of this (blocked_queue.c) to handle the blocked queue.
-// The provided queue seems to just be something to run the thread_handler stuff.
-//
-
-static Q_type queue = {NULL, NULL, 0};
+static BQ_type queue = {NULL, NULL, 0};
 
 #define DISABLE_INTERRUPTS() {  \
     asm("wrctl status, zero");  \
@@ -18,8 +14,8 @@ static Q_type queue = {NULL, NULL, 0};
 
 void enqueue(void *data)
 {
-    E_type  *elem;
-    
+    BE_type  *elem;
+
     if ((elem = (E_type *)malloc(sizeof(E_type))) == NULL)
     {
         printf("Unable to allocate space!\n");
@@ -27,7 +23,7 @@ void enqueue(void *data)
     }
     elem->data = data;
     elem->next = NULL;
-    
+
     if (queue.head == NULL)
         queue.head = elem;
     else
@@ -39,21 +35,21 @@ void enqueue(void *data)
 
 void *dequeue()
 {
-    E_type  *elem;
+    BE_type  *elem;
     void    *data = NULL;
-    
+
     if (queue.size != 0)
     {
         elem = queue.head;
         if (queue.size == 1)
             queue.tail = NULL;
         queue.head = queue.head->next;
-        
+
         queue.size--;
         data = elem->data;
         free(elem);
     }
-        
+
     return data;
 }
 
