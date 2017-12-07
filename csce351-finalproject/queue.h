@@ -7,6 +7,9 @@ Description:
     Functions used to implment a queue and its operations
 */
 
+#ifndef _QUEUE_H_
+#define _QUEUE_H_
+
 typedef struct element_type
 {
     void                *data;
@@ -25,3 +28,5 @@ void enqueue(void *data);
 void *dequeue();
 
 unsigned int getQsize();
+
+#endif

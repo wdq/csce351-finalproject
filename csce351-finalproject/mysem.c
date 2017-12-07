@@ -16,6 +16,7 @@ int semInit(semaphore * sem, int semVal)
 {
 	sem->threadCount = 0;
 	sem->value = semVal;
+	sem->queue = (BQ_type) {NULL, NULL, 0};
 	/* add your code to initialize your semaphore here */
 	return 1;
 }
@@ -27,10 +28,11 @@ int semInit(semaphore * sem, int semVal)
 void semDown(semaphore * sem)
 {
 	if(semValue(sem) == 0) {
-		while(1) {
-			if(semValue(sem) > 0) {
-				break;
-			}
+		mythread_block_self(&sem); // block yourself
+		while(1) { // burn off the rest of your quantum
+			//if(semValue(sem) > 0) {
+			//	break;
+			//}
 		}
 	}
 	unsigned int currentSemValue = semValue(sem);
@@ -47,7 +49,11 @@ void semDown(semaphore * sem)
 // As such, after an up on a semaphore with threads sleeping on it, the semaphore value is still 0, but there are no more sleeping threads.
 void semUp(semaphore * sem)
 {
+	printf("A\n");
 	sem->value = semValue(sem) + 1;
+	printf("B\n");
+	mythread_unblock_sem(&sem);
+	printf("I\n");
 	/* implement your logic to perform up operation on a semaphore here */
 }
 

@@ -6,6 +6,7 @@
 Description:
     Functions used to manage threads
 */
+#include "mysem.h"
 
 /* possible thread states */
 enum tstate {NEW, READY, RUNNING, BLOCKED, TERMINATED, NUM_TSTATES};
@@ -28,6 +29,10 @@ void mythread_start(tcb *thread_pointer);
 void mythread_join(tcb *thread_pointer);
 
 void mythread_block(tcb *thread_pointer);
+
+void mythread_block_self(semaphore * sem);
+
+void mythread_unblock_sem(semaphore * sem);
 
 void mythread_terminate(tcb *thread_pointer);
 

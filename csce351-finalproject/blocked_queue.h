@@ -1,18 +1,23 @@
-typedef struct element_type
+#ifndef _BLOCKED_QUEUE_H_
+#define _BLOCKED_QUEUE_H_
+
+typedef struct belement_type
 {
     void                *data;
-    struct element_type *next;
+    struct belement_type *next;
 } BE_type;
 
-typedef struct queue_type
+typedef struct bqueue_type
 {
     BE_type              *head;
     BE_type              *tail;
     unsigned int        size;
 } BQ_type;
 
-void enqueue(void *data);
+void benqueue(void *data, BQ_type *queue);
 
-void *dequeue();
+void *bdequeue(BQ_type *queue);
 
-unsigned int getQsize();
+unsigned int bgetQsize(BQ_type *queue);
+
+#endif

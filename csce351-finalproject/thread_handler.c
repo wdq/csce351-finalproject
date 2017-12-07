@@ -5,6 +5,8 @@
 #include "alarm_handler.h"
 #include "thread_handler.h"
 #include "queue.h"
+#include "blocked_queue.h"
+#include "mysem.h"
 
 #define DELAY 10000
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
@@ -81,6 +83,35 @@ void mythread_block(tcb *thread_pointer)
 {
     // assert(thread_pointer && thread_pointer->state == RUNNING);
     thread_pointer->state = BLOCKED;
+}
+
+// Block the thread the calls this function.
+void mythread_block_self(semaphore * sem) {
+	//DISABLE_INTERRUPTS();
+	printf("A-0: %d\n", current_running_thread->tid);
+	if(current_running_thread != NULL) {
+		current_running_thread->state = BLOCKED; // set yourself to blocked
+	    benqueue(current_running_thread, &sem->queue); // add yourself to the blocked queue
+	    //dequeue(current_running_thread); //
+	}
+	//ENABLE_INTERRUPTS();
+}
+
+// Unblock all of the threads that are waiting on a semaphore.
+void mythread_unblock_sem(semaphore * sem) {
+	//DISABLE_INTERRUPTS();
+	printf("C: %d\n", current_running_thread->tid);
+	while(bgetQsize(&sem->queue) > 0) { // Go until there are no more blocked threads in the queue
+		printf("D\n");
+		tcb *dequeuedThread = bdequeue(&sem->queue); // dequeue one thread
+		printf("E\n");
+		dequeuedThread->state = READY; // set it to the ready state
+		printf("F\n");
+		enqueue(dequeuedThread); // add it back to the run queue
+		printf("G\n");
+	}
+	printf("H\n");
+	//ENABLE_INTERRUPTS();
 }
 
 /* RUNNING ----> TERMINATED */

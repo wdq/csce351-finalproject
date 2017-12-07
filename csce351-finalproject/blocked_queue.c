@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "blocked_queue.h"
 
-static BQ_type queue = {NULL, NULL, 0};
+//static BQ_type queue = {NULL, NULL, 0};
 
 #define DISABLE_INTERRUPTS() {  \
     asm("wrctl status, zero");  \
@@ -12,11 +12,11 @@ static BQ_type queue = {NULL, NULL, 0};
     asm("wrctl status, et");    \
 }
 
-void enqueue(void *data)
+void benqueue(void *data, BQ_type *queue)
 {
     BE_type  *elem;
 
-    if ((elem = (E_type *)malloc(sizeof(E_type))) == NULL)
+    if ((elem = (BE_type *)malloc(sizeof(BE_type))) == NULL)
     {
         printf("Unable to allocate space!\n");
         exit(1);
@@ -24,28 +24,28 @@ void enqueue(void *data)
     elem->data = data;
     elem->next = NULL;
 
-    if (queue.head == NULL)
-        queue.head = elem;
+    if (queue->head == NULL)
+        queue->head = elem;
     else
-        queue.tail->next = elem;
-    queue.tail = elem;
+        queue->tail->next = elem;
+    queue->tail = elem;
 
-    queue.size++;
+    queue->size = queue->size + 1;
 }
 
-void *dequeue()
+void *bdequeue(BQ_type *queue)
 {
     BE_type  *elem;
     void    *data = NULL;
 
-    if (queue.size != 0)
+    if (queue->size != 0)
     {
-        elem = queue.head;
-        if (queue.size == 1)
-            queue.tail = NULL;
-        queue.head = queue.head->next;
+        elem = queue->head;
+        if (queue->size == 1)
+            queue->tail = NULL;
+        queue->head = queue->head->next;
 
-        queue.size--;
+        queue->size = queue->size - 1;
         data = elem->data;
         free(elem);
     }
@@ -53,7 +53,7 @@ void *dequeue()
     return data;
 }
 
-unsigned int getQsize()
+unsigned int bgetQsize(BQ_type *queue)
 {
-    return queue.size;
+    return queue->size;
 }

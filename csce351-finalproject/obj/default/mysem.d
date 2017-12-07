@@ -1,5 +1,5 @@
-obj/default/mysem.o: mysem.c mysem.h queue.h
+obj/default/mysem.o: mysem.c mysem.h blocked_queue.h
 
 mysem.h:
 
-queue.h:
+blocked_queue.h:
