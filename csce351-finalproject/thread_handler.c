@@ -88,10 +88,12 @@ void mythread_block(tcb *thread_pointer)
 // Block the thread the calls this function.
 void mythread_block_self(semaphore * sem) {
 	//DISABLE_INTERRUPTS();
-	printf("A-0: %d\n", current_running_thread->tid);
+	//printf("A-0: %d\n", current_running_thread->tid);
 	if(current_running_thread != NULL) {
+		//printf("A-0-0\n");
 		current_running_thread->state = BLOCKED; // set yourself to blocked
 	    benqueue(current_running_thread, &sem->queue); // add yourself to the blocked queue
+	    //printf("A-0-1\n");
 	    //dequeue(current_running_thread); //
 	}
 	//ENABLE_INTERRUPTS();
@@ -100,18 +102,28 @@ void mythread_block_self(semaphore * sem) {
 // Unblock all of the threads that are waiting on a semaphore.
 void mythread_unblock_sem(semaphore * sem) {
 	//DISABLE_INTERRUPTS();
-	printf("C: %d\n", current_running_thread->tid);
+	printf("C: tid=%d, bqsize=%d\n", current_running_thread->tid, bgetQsize(&sem->queue));
+	tcb *dequeuedThread = NULL;
 	while(bgetQsize(&sem->queue) > 0) { // Go until there are no more blocked threads in the queue
-		printf("D\n");
-		tcb *dequeuedThread = bdequeue(&sem->queue); // dequeue one thread
-		printf("E\n");
+		dequeuedThread = bdequeue(&sem->queue);
+		//printf("D\n");
+		if(dequeuedThread == NULL) {
+			//printf("D-1\n");
+			break;
+		}
+		//tcb *dequeuedThread = bdequeue(&sem->queue); // dequeue one thread
+		//printf("E\n");
 		dequeuedThread->state = READY; // set it to the ready state
-		printf("F\n");
+		//printf("F\n");
 		enqueue(dequeuedThread); // add it back to the run queue
-		printf("G\n");
+		//printf("G\n");
 	}
-	printf("H\n");
+	//printf("H\n");
 	//ENABLE_INTERRUPTS();
+}
+
+tcb *mythread_get_current_thread() {
+	return current_running_thread;
 }
 
 /* RUNNING ----> TERMINATED */
@@ -140,6 +152,10 @@ void *mythread_schedule(void *context)
         
         current_running_thread = (tcb *)dequeue();
         // assert(current_running_thread->state == READY);
+        if(current_running_thread->state == BLOCKED) {
+        	mythread_schedule(&context);
+
+        }
         current_running_thread->state = RUNNING;
         
         context = (void *)(current_running_thread->stack_pointer);

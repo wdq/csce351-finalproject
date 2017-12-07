@@ -34,6 +34,8 @@ void mythread_block_self(semaphore * sem);
 
 void mythread_unblock_sem(semaphore * sem);
 
+tcb *mythread_get_current_thread();
+
 void mythread_terminate(tcb *thread_pointer);
 
 void *mythread_schedule(void *context);

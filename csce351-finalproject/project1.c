@@ -4,7 +4,7 @@
 #include "thread_handler.h"
 #include "mysem.h"
 
-#define NUM_THREADS 15
+#define NUM_THREADS 5
 #define CHAIRS 5
 
 /* a delay time used to adjust the frequency of printf messages */
@@ -23,9 +23,11 @@ void customer(unsigned int tid)
 		semDown(&mutex);
 		if (waiting < CHAIRS){
 			waiting = waiting + 1;
-			printf("C: %d customer(s) waiting.\n", waiting);
+			printf("C-A: %d customer(s) waiting.\n", waiting);
 			semUp(&customerAvailable);
+			//printf("C-B: %d customer(s) waiting.\n", waiting);
 			semUp(&mutex);
+			//printf("C-C: %d customer(s) waiting.\n", waiting);
 			semDown(&stylistAvailable);
 			printf("C: stylistAvailable = %d.\n", semThreadCount(&stylistAvailable));
 			printf("C: customerAvailable = %d.\n", semValue(&customerAvailable));

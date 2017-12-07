@@ -7,6 +7,7 @@
 
 #include "mysem.h"
 #include <stdio.h>
+#include "thread_handler.h"
 
 // Returns 1 if initialization is successful
 // Returns 0 if it fails.
@@ -27,19 +28,37 @@ int semInit(semaphore * sem, int semVal)
 // As such, the semaphore value never falls below 0.
 void semDown(semaphore * sem)
 {
-	if(semValue(sem) == 0) {
+	//printf("D-1\n");
+	tcb *currentThread = mythread_get_current_thread(); // Get current thread pointer
+	printf("semDown start from thread #%d\n", currentThread->tid);
+	//printf("D-2\n");
+	if(sem->value > 0) {
+		//printf("D-3\n");
+		sem->value = sem->value - 1; // If the semaphore is available, take it (decrement).
+	} else if(sem->value <= 0) {
+		//printf("D-4\n");
+		mythread_block_self(&sem); // If the semaphore is already taken, then block yourself.
+		while(currentThread->state == BLOCKED ) { // Wait until no longer blocked.
+		}
+		//printf("D-5\n");
+		semDown(sem); // Retry taking the semaphore.
+		printf("semDown finish from thread #%d\n", currentThread->tid);
+	}
+	//printf("D-6\n");
+
+	/*if(semValue(sem) == 0) {
 		mythread_block_self(&sem); // block yourself
 		while(1) { // burn off the rest of your quantum
-			//if(semValue(sem) > 0) {
-			//	break;
-			//}
+			if(semValue(sem) > 0) {
+				break;
+			}
 		}
 	}
 	unsigned int currentSemValue = semValue(sem);
 
-	if(currentSemValue > 0) {
+	//if(currentSemValue > 0) {
 		sem->value = currentSemValue - 1;
-	}
+	//}*/
 	/* implement your logic to perform down operation on a semaphore here */
 }
 
@@ -49,11 +68,14 @@ void semDown(semaphore * sem)
 // As such, after an up on a semaphore with threads sleeping on it, the semaphore value is still 0, but there are no more sleeping threads.
 void semUp(semaphore * sem)
 {
-	printf("A\n");
-	sem->value = semValue(sem) + 1;
-	printf("B\n");
+	tcb *currentThread = mythread_get_current_thread(); // Get current thread pointer
+	printf("semUp start from thread #%d\n", currentThread->tid);
+	//printf("A\n");
+	sem->value = sem->value + 1;
+	//printf("B\n");
 	mythread_unblock_sem(&sem);
-	printf("I\n");
+	//printf("I\n");
+	printf("semUp finish from thread #%d\n", currentThread->tid);
 	/* implement your logic to perform up operation on a semaphore here */
 }
 
