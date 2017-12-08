@@ -87,6 +87,7 @@ void mythread_block(tcb *thread_pointer)
 
 // Block the thread the calls this function.
 void mythread_block_self(semaphore * sem) {
+	asm("wrctl status, zero");
 	//DISABLE_INTERRUPTS();
 	//printf("A-0: %d\n", current_running_thread->tid);
 	if(current_running_thread != NULL) {
@@ -96,11 +97,14 @@ void mythread_block_self(semaphore * sem) {
 	    //printf("A-0-1\n");
 	    //dequeue(current_running_thread); //
 	}
+    asm("movi et, 1");
+    asm("wrctl status, et");
 	//ENABLE_INTERRUPTS();
 }
 
 // Unblock all of the threads that are waiting on a semaphore.
 void mythread_unblock_sem(semaphore * sem) {
+	asm("wrctl status, zero");
 	//DISABLE_INTERRUPTS();
 	printf("C: tid=%d, bqsize=%d\n", current_running_thread->tid, bgetQsize(&sem->queue));
 	tcb *dequeuedThread = NULL;
@@ -120,6 +124,8 @@ void mythread_unblock_sem(semaphore * sem) {
 	}
 	//printf("H\n");
 	//ENABLE_INTERRUPTS();
+    asm("movi et, 1");
+    asm("wrctl status, et");
 }
 
 tcb *mythread_get_current_thread() {
@@ -135,27 +141,36 @@ void mythread_terminate(tcb *thread_pointer)
 
 void *mythread_schedule(void *context)
 {
+	printf("mythread_schedule() running (queue size=%d) (status=%d) (tid=%d)\n", getQsize(), current_running_thread->state, current_running_thread->tid);
     if (getQsize() > 0)
     {
-        if (current_running_thread != NULL)
+        if (current_running_thread != NULL) // if there is already a thread running, set it to ready, and add to the queue
         {
-            // assert(current_running_thread->state == RUNNING);
-            // assert(main_stack_pointer != NULL);
-            current_running_thread->state = READY;
-            current_running_thread->stack_pointer = (unsigned int *)context;
-            enqueue(current_running_thread);
+        	printf("S-A\n");
+        	if(current_running_thread->state == BLOCKED) {
+        		current_running_thread->stack_pointer = (unsigned int *)context;
+        		printf("S-A-1\n");
+        	} else {
+        		printf("S-A-2\n");
+				// assert(current_running_thread->state == RUNNING);
+				// assert(main_stack_pointer != NULL);
+				current_running_thread->state = READY;
+				current_running_thread->stack_pointer = (unsigned int *)context;
+				enqueue(current_running_thread);
+        	}
         }
-        else if (main_stack_pointer == NULL)
+        else if (main_stack_pointer == NULL) // if there isn't already a thread running, don't do anything with the current thread
         {
+        	printf("S-B\n");
             main_stack_pointer = (unsigned int *)context;
         }
         
-        current_running_thread = (tcb *)dequeue();
+        current_running_thread = (tcb *)dequeue(); // get a new thread to run from the queue
         // assert(current_running_thread->state == READY);
-        if(current_running_thread->state == BLOCKED) {
-        	mythread_schedule(&context);
+        //if(current_running_thread->state == BLOCKED) {
+        //	mythread_schedule(&context);
 
-        }
+        //}
         current_running_thread->state = RUNNING;
         
         context = (void *)(current_running_thread->stack_pointer);
