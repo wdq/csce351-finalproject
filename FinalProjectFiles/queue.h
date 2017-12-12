@@ -31,10 +31,6 @@ void enqueue(void *data);
 
 void enqueueQ(void *data, Q_type *inqueue);
 
-void enqueueFront(void *data);
-
-void enqueueFrontQ(void *data, Q_type *inqueue);
-
 void *dequeue();
 
 void *dequeueQ(Q_type *inqueue);

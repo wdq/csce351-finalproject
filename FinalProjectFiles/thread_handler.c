@@ -96,14 +96,10 @@ void mythread_terminate(tcb *thread_pointer)
 
 void *mythread_schedule(void *context)
 {
-	//printf("mythread_schedule() running (queue size=%d) (status=%d) (tid=%d)\n", getQsize(), current_running_thread->state, current_running_thread->tid);
-	//printf("mythread_schedule(), (current tid=%d), (queue size=%d)\n", current_running_thread->tid, getQsize());
     if (getQsize() > 0)
     {
-    	//printf("mythread_schedule() A\n");
         if (current_running_thread != NULL && current_running_thread->state != BLOCKED)//&& current_running_thread->state != BLOCKED)
         {
-        	//printf("mythread_schedule() B\n");
             // assert(current_running_thread->state == RUNNING);
             // assert(main_stack_pointer != NULL);
             current_running_thread->state = READY;
@@ -115,7 +111,6 @@ void *mythread_schedule(void *context)
         }
         else if (main_stack_pointer == NULL)
         {
-        	//printf("mythread_schedule() C\n");
             main_stack_pointer = (unsigned int *)context;
         }
         
@@ -124,16 +119,11 @@ void *mythread_schedule(void *context)
         current_running_thread->state = RUNNING;
         
         context = (void *)(current_running_thread->stack_pointer);
-        //printf("mythread_schedule() D\n");
     }
     else if (current_running_thread==NULL && main_stack_pointer!=NULL)
     {        
-    	//printf("mythread_schedule() E\n");
         context = (void *)main_stack_pointer;
     }
-    //printf("mythread_schedule() F\n");
-    //printf("state=%d, \n", current_running_thread->state);
-    //printf("--------------------------------running tid=%d--------------------------------\n", current_running_thread->tid);
 
     return context;
 }
@@ -145,7 +135,6 @@ unsigned int mythread_isQempty()
 
 void mythread_cleanup()
 {
-	//printf("mythread_cleanup(), (tid=%d)\n", current_running_thread->tid);
 	int count = 0;
     DISABLE_INTERRUPTS();
     mythread_terminate(current_running_thread);

@@ -28,35 +28,6 @@ void enqueueQ(void *data, Q_type *inqueue) {
     inqueue->size++;
 }
 
-void enqueueFront(void *data)
-{
-	enqueueFrontQ(data, &queue);
-}
-
-void enqueueFrontQ(void *data, Q_type *inqueue) {
-	enqueueQ(data, inqueue);
-    /*E_type  *elem;
-
-    if ((elem = (E_type *)malloc(sizeof(E_type))) == NULL)
-    {
-        printf("Unable to allocate space!\n");
-        exit(1);
-    }
-    elem->data = data;
-    elem->next = NULL;
-
-    if (inqueue->head == NULL) {
-    	inqueue->head = elem;
-    } else {
-    	elem->next = inqueue->head;
-    	inqueue->head = elem;
-    	//inqueue->tail->next = elem;
-    }
-    //inqueue->tail = elem;
-
-    inqueue->size++;*/
-}
-
 void *dequeue()
 {
 	dequeueQ(&queue);
